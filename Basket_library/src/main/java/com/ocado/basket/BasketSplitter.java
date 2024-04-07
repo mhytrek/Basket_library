@@ -13,15 +13,16 @@ class ProductException extends RuntimeException{
     }
 }
 public class BasketSplitter {
-    private Map<String, List<String>> productsDeliveryTypes = new HashMap<>();
+    private Map<String, List<String>> productsDeliveryTypes;
     private HashMap<String, Integer> deliveryCounter;
     private Map<String, List<String>> splittedDeliveries;
 
-    public BasketSplitter(String absolutePathToConfigFile){
+    public BasketSplitter(String absolutePathToConfigFile) {
         // Changing json file to Map<String, List<String>>
         ObjectMapper mapper = new ObjectMapper();
         try {
-            productsDeliveryTypes = mapper.readValue(new File(absolutePathToConfigFile), new TypeReference<Map<String, List<String>>>() {});
+            productsDeliveryTypes = mapper.readValue(new File(absolutePathToConfigFile), new TypeReference<Map<String, List<String>>>() {
+            });
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -32,19 +33,12 @@ public class BasketSplitter {
         return productsDeliveryTypes;
     }
 
-    public HashMap<String, Integer> getDeliveryCounter() {
-        return deliveryCounter;
-    }
 
-    public Map<String, List<String>> getSplittedDeliveries() {
-        return splittedDeliveries;
-    }
-
-    // Counts the max amount of products from a basket that can be delivered by each type
+    // Counts the max amount of remaining products that can be delivered by each type
     public void countDeliveries(List<String> products) throws ProductException {
         deliveryCounter = new HashMap<>();
-        for(String product: products) {
-            if (!productsDeliveryTypes.containsKey(product)){
+        for (String product : products) {
+            if (!productsDeliveryTypes.containsKey(product)) {
                 throw new ProductException("delivery type for " + product);
             }
             for (String possibleDelivery : productsDeliveryTypes.get(product)) {
@@ -58,19 +52,13 @@ public class BasketSplitter {
     }
 
 
-    // give the max amount of products that can be delivered by each delivery type
-    public Integer getMaxDeliveries(String product){
-        return deliveryCounter.get(product);
-    }
 
-
-    // get the best delivery for a product
-    public String getBestDelivery(String product){
-        List<String> deliveryTypes = productsDeliveryTypes.get(product);
-        deliveryTypes = productsDeliveryTypes.get(product);
-        return Collections.max(deliveryTypes, (delivery1, delivery2) -> {
-            int max1 = getMaxDeliveries(delivery1);
-            int max2 = getMaxDeliveries(delivery2);
+    // get the best delivery for remaining products
+    public String getBestDelivery(List<String> products) {
+        countDeliveries(products);
+        return Collections.max(deliveryCounter.keySet(), (delivery1, delivery2) -> {
+            int max1 = deliveryCounter.get(delivery1);
+            int max2 = deliveryCounter.get(delivery2);
             if (max1 == max2) {
                 return delivery1.compareTo(delivery2);
             }
@@ -79,23 +67,29 @@ public class BasketSplitter {
     }
 
 
-    // add a product to a given delivery type  list
-    public void addToList(String delivery, String product){
-        if(splittedDeliveries.containsKey(delivery)){
-            splittedDeliveries.get(delivery).add(product);
-        } else{
-            splittedDeliveries.put(delivery, new ArrayList<String>(List.of(product)));
+    // add a new delivery group with products
+    public List<String> addToList(String delivery, List<String> products) {
+        List<String> productList = new ArrayList<>();
+        List<String> productNoDelivery = new ArrayList<>();
+        for(String product: products){
+            if(productsDeliveryTypes.get(product).contains(delivery)){
+                productList.add(product);
+            }
+            else {
+                productNoDelivery.add(product);
+            }
         }
+        splittedDeliveries.put(delivery, productList);
+        return productNoDelivery;
     }
 
 
     // Split the products in basket into delivery groups
-    public Map<String, List <String>> split(List<String> items){
-        countDeliveries(items);
+    public Map<String, List<String>> split(List<String> items) {
         splittedDeliveries = new HashMap<>();
-        for(String product: items){
-            String bestDelivery = getBestDelivery(product);
-            addToList(bestDelivery, product);
+        while (!items.isEmpty()) {
+            String bestDelivery = getBestDelivery(items);
+            items = addToList(bestDelivery, items);
         }
         return splittedDeliveries;
     }
