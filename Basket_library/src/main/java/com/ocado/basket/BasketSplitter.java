@@ -1,17 +1,17 @@
 package com.ocado.basket;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 class ProductException extends RuntimeException{
     public ProductException(String reason) {
         super("Cannot find " + reason);
     }
 }
-
 public class BasketSplitter {
     private Map<String, List<String>> productsDeliveryTypes = new HashMap<>();
     private HashMap<String, Integer> deliveryCounter;
@@ -27,8 +27,20 @@ public class BasketSplitter {
         }
     }
 
+    // getters made for testing only
+    public Map<String, List<String>> getProductsDeliveryTypes() {
+        return productsDeliveryTypes;
+    }
 
-// Counts the max amount of products from a basket that can be delivered by each type
+    public HashMap<String, Integer> getDeliveryCounter() {
+        return deliveryCounter;
+    }
+
+    public Map<String, List<String>> getSplittedDeliveries() {
+        return splittedDeliveries;
+    }
+
+    // Counts the max amount of products from a basket that can be delivered by each type
     public void countDeliveries(List<String> products) throws ProductException {
         deliveryCounter = new HashMap<>();
         for(String product: products) {
@@ -56,7 +68,14 @@ public class BasketSplitter {
     public String getBestDelivery(String product){
         List<String> deliveryTypes = productsDeliveryTypes.get(product);
         deliveryTypes = productsDeliveryTypes.get(product);
-        return Collections.max(deliveryTypes,(delivery1, delivery2) -> Integer.compare(getMaxDeliveries(delivery1), getMaxDeliveries(delivery2)));
+        return Collections.max(deliveryTypes, (delivery1, delivery2) -> {
+            int max1 = getMaxDeliveries(delivery1);
+            int max2 = getMaxDeliveries(delivery2);
+            if (max1 == max2) {
+                return delivery1.compareTo(delivery2);
+            }
+            return Integer.compare(max1, max2);
+        });
     }
 
 
@@ -71,7 +90,7 @@ public class BasketSplitter {
 
 
     // Split the products in basket into delivery groups
-    public Map<String, List <String>> split(List<String> items) {
+    public Map<String, List <String>> split(List<String> items){
         countDeliveries(items);
         splittedDeliveries = new HashMap<>();
         for(String product: items){
