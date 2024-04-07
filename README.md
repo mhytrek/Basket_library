@@ -27,7 +27,7 @@ Map<String, List<String>> delivery = basketSplitter.split(List<String> productsI
 ```
 
 ## Code
-[source kod](https://github.com/mhytrek/Ocado_basket_library/tree/main/Basket_library) \
+[source cod](https://github.com/mhytrek/Ocado_basket_library/tree/main/Basket_library) \
 [.jar file with library](https://github.com/mhytrek/Ocado_basket_library/releases/tag/v1.0.0)
 
 ## Used
