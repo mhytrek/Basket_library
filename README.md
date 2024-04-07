@@ -12,7 +12,7 @@ Criterias:
 You neeed to have config.json file where you have all products from your your shop and delivery types for each of this products.
 
 ##
-[source kod](https://github.com/mhytrek/Ocado_basket_library/tree/main/Basket_library)
+[source kod](https://github.com/mhytrek/Ocado_basket_library/tree/main/Basket_library) \
 [.jar file with library]()
 
 ## Used
