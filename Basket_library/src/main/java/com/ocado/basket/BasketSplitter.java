@@ -13,7 +13,7 @@ class ProductException extends RuntimeException{
     }
 }
 public class BasketSplitter {
-    private Map<String, List<String>> productsDeliveryTypes;
+    private final Map<String, List<String>> productsDeliveryTypes;
     private HashMap<String, Integer> deliveryCounter;
     private Map<String, List<String>> splittedDeliveries;
 
