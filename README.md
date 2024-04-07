@@ -13,7 +13,7 @@ You neeed to have config.json file where you have all products from your your sh
 
 ##
 [source kod](https://github.com/mhytrek/Ocado_basket_library/tree/main/Basket_library) \
-[.jar file with library]()
+[.jar file with library](https://github.com/mhytrek/Ocado_basket_library/releases/tag/v1.0.0)
 
 ## Used
 Java 11, Gradle
